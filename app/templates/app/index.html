@@ -1,0 +1,183 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+
+
+<div class="jumbotron">
+    <h1>Southern Sierra Wildflower Club</h1>
+    <p class="lead">Look for recent flower sightings, add new sightings, and update info in the database!</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>See recent sightings!</h2>
+        <p>
+            Select a flower and see up to 10 of the most recent sightings of it!
+        </p>
+
+        <form method="POST" id="flower_select">
+
+            {% csrf_token %}
+
+            <select name="flowerdropdown">
+            {% for flower in all_flowers  %}
+                
+                {% if all_sightings.0.name == flower.name %}
+                    <option value="{{flower.name}}" selected="selected">  {{flower.name}}    </option>
+                {% else %}
+                    <option value="{{flower.name}}">  {{flower.name}}    </option>
+                {% endif %}
+            {% endfor %}
+
+            
+
+            </select>
+
+            <input id="filter" type="submit" value="Select Flower"  class="btn btn-default"/>
+        </form>
+
+
+        {% if all_sightings %}
+            <ol>
+            {% for sighting in all_sightings %}
+                <li> <b>Date Seen:</b> {{ sighting.sighted }}, <b>Location:</b> {{ sighting.location}}, <b>Found By:</b> {{sighting.person}} </li>
+            {% endfor %}
+            </ol>
+
+            {%if image_url%}
+            <img src="{{image_url}}" alt="Photo of {{all_sightings.0.name}}">
+            {%endif%}
+
+        {% else %}
+            <p>No flower selected yet!</p>
+        {% endif %}
+
+
+
+    </div>
+    <div class="col-md-4">
+        <h2>Update flower information</h2>
+        <p>See something wrong about a flower's sighting info? Change it here!</p>
+
+    <form method="POST" id="sighting_update">
+
+        {% csrf_token %}
+
+        {% if updateStatus == "Update" %} New flower listed:
+        <br>
+        <input type="text" name="sighting_update_flower" value="{{sighting_lookup.0.name}}">
+        <br>
+
+        {% else %} Current flower listed: 
+        <br>
+        <select name="sighting_update_flower">
+            {% for flower in all_flowers  %}
+                    <option value="{{flower.name}}">  {{flower.name}}    </option>
+
+            {% endfor %}
+        </select> <br>
+        {% endif %}
+
+
+        {% if updateStatus == "Update" %} New person listed:
+        <br>
+        <input type="text" name="sighting_update_person" value="{{sighting_lookup.0.person}}">
+        <br>
+
+        {% else %} Current person listed: 
+        <br>
+        <select name="sighting_update_person">
+            {% for person in all_people  %}
+                    <option value="{{person.person}}">  {{person.person}}    </option>
+
+            {% endfor %}
+        </select> <br>
+        {% endif %}
+
+
+        {% if updateStatus == "Update" %} New location listed:
+        <br>
+        <input type="text" name="sighting_update_location" value="{{sighting_lookup.0.location}}">
+        <br>
+
+        {% else %} Current location listed: 
+        <br>
+        <select name="sighting_update_location">
+            {% for location in all_locations  %}
+                    <option value="{{location.location}}">  {{location.location}}    </option>
+
+            {% endfor %}
+        </select> <br>
+        {% endif %}
+
+        
+        {% if updateStatus == "Update" %} New date listed (YYYY-MM-DD):
+        {% else %} Current date listed (YYYY-MM-DD): {% endif %}
+        <br>
+
+        <input type="text" name="sighting_update_date" {% if updateStatus == "Update" %} value="{{sighting_lookup.0.sighted}}" {% endif %}><br>
+
+
+
+        {% if updateStatus == "Update" %}
+            <input type="hidden" id="entryID" name="entryID" value="{{sighting_lookup.0.id}}">
+            <input id="filter" type="submit" value="Update" name="SubmitButton"  class="btn btn-default"/>
+        {% else %}
+            <input id="filter" type="submit" value="Lookup" name="SubmitButton"  class="btn btn-default"/>
+        {% endif %}
+
+        <p>
+
+            {% if updateStatus == "Update" %}
+                Entry found in the database! Please change the data to correct it! If you want to DELETE this entry, leave all entries blank.
+            {% elif updateStatus == "Attempted: Incomplete" %}
+                Please fill out <b>ALL</b> fields to look up an entry
+            {% elif updateStatus == "Attempted: Not Found" %}
+                Entry not found in database
+            {% elif updateStatus == "Lookup" %}
+                Please fill out all the fields corresponding to the entry you would like to change.
+            {% elif updateStatus == "Successful" %}
+                Entry successfully updated in database!
+
+
+            {% endif %}
+        </p>
+
+        
+    </form>
+      
+
+    </div>
+
+    
+    <div class="col-md-4">
+        <h2>Post your sightings!</h2>
+        <p>See a new flower on your hike? Post it here so everyone can locate it!</p>
+
+        <form method="POST" id="sighting_insert">
+            {% csrf_token %}
+
+            Flower's common name:<br>
+            <input type="text" name="sighted_flower"><br>
+        
+            Your name:<br>
+            <input type="text" name="sighted_name" {% if user.is_authenticated %} value="{{user.username}}" {%endif%}><br>
+
+            Location found:<br>
+            <input type="text" name="sighted_location"><br>
+
+            Date found (YYYY-MM-DD):<br>
+            <input type="text" name="sighted_date"><br>
+
+            <input id="insert_flower" type="submit" value="Add Sighting"  class="btn btn-default"/>
+        </form>
+
+        {% if insert_attempted %}
+            <p>{{return_message}}</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

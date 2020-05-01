@@ -1,0 +1,68 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+
+
+<div class="jumbotron">
+    <h1>Southern Sierra Wildflower Club</h1>
+    <p class="lead">Look for recent flower sightings, add new sightings, and update info in the database!</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>See recent sightings!</h2>
+        <p>
+            Select a flower and see 10 of the most recent sightings of it!
+        </p>
+
+        
+        <select>
+        {% for sighting in all_sightings  %}
+            <option value="{{sighting.name}}">  {{sighting.name}}, {{sighting.person}}, {{sighting.location}}, {{sighting.sighted}}    </option>
+        {% endfor %}
+            <option value="1"> test </option>
+        </select>
+
+        
+
+
+
+    </div>
+    <div class="col-md-4">
+        <h2>Update flower information</h2>
+        <p>See something wrong about a flower's sighting info? Change it here!</p>
+
+    <form>
+        Current name value:<br>
+        <input type="text" name="flower_name" readonly><br>
+        
+        Current found by:<br>
+        <input type="text" name="person_name" readonly><br>
+
+        Current location listed:<br>
+        <input type="text" name="old_location" readonly><br>
+
+        Current found date listed:<br>
+        <input type="text" name="old_date" readonly><br>
+
+        New name value:<br>
+        <input type="text" name="flower_name"><br>
+        
+        New found by:<br>
+        <input type="text" name="person_name"><br>
+
+        New location listed:<br>
+        <input type="text" name="old_location"><br>
+
+        New found date listed:<br>
+        <input type="text" name="old_date"><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+
+    </div>
+</div>
+
+{% endblock %}
