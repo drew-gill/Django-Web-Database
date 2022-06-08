@@ -9,7 +9,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from app import forms, views
 from app.models import *
 import app.views
-from django.conf.urls import url
+from django.urls import re_path
 
 urlpatterns = [
     path('',
